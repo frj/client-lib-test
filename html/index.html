@@ -1,0 +1,76 @@
+<html>
+<head>
+	<title>this is the title</title>
+</head>
+<body>
+
+<style>
+    .user-data .name {font-weight:bold;}
+</style>
+
+<ul class="user-data">
+    <li id="cookie-id">
+        <span class="name">id from cookie</span>
+        <span class="value"></span>
+    </li>
+    <li id="cookie-email-address">
+        <span class="name">email from cookie</span>
+        <span class="value"></span>
+    </li>
+    <li id="cookie-display-name">
+        <span class="name">displayname from cookie</span>
+        <span class="value"></span>
+    </li>
+    <li id="cookie-packages">
+        <span class="name">packages from cookie</span>
+        <span class="value"></span>
+    </li>
+
+    <li id="api-response">
+        <span class="name">email from api</span>
+        <span class="value"></span>
+    </li>
+
+</ul>
+
+    <script type="text/javascript" src="http://localhost:8082/html/base64.js"></script>
+
+<script type="text/javascript">
+    var guU = jQ.cookie("GU_U");
+    var userDataString = Base64.decode(guU.split('.')[0]);
+    var userData = eval(userDataString);
+    jQ("#cookie-id .value").text(userData[0]);
+    jQ("#cookie-email-address .value").text(userData[1]);
+    jQ("#cookie-display-name .value").text(userData[2]);
+
+
+    var packages = ["BEEN_THERE", "BASIC_IDENTITY", "BASIC_COMMUNITY", "EXTRA" , "GUARDIAN_JOBS", "TV_LISTINGS", "NEWSPAPER_DIRECT", "TEACHERS_NETWORK", "DIGITAL_ARCHIVE", "CLIPPINGS", "GUARDIAN_HOLIDAY_OFFERS"];
+    var userPackages = [];
+
+
+    var packageBitMap = userData[3];
+    for(i = 0; i < packages.length; i++) {
+        if(packageBitMap & Math.pow(2, i)) {
+            userPackages.push(packages[i])
+        }
+    }
+
+    jQ("#cookie-packages .value").text(userPackages.join(','));
+
+    jQ.ajax({
+        url: 'https://qaidapi01.gudev.gnl:8800/identity-api/user/' + userData[0],
+        cache: false,
+        crossDomain: true,
+        dataType: 'jsonp'
+    }).success(function(userResponse) {
+        var user = Base64.decode(guU.split('.')[0]); userResponse.user
+        jQ("#api-response .value").text(JSON.stringify(user));
+    });
+
+
+
+
+</script>
+
+</body>
+</html>
