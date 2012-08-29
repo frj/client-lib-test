@@ -33,12 +33,12 @@
 
 </ul>
 
-    <script type="text/javascript" src="http://localhost:8082/html/base64.js"></script>
+    <script type="text/javascript" src="http://identity-clientlib-test.appspot.com/html/base64.js"></script>
 
 <script type="text/javascript">
     var guU = jQ.cookie("GU_U");
-    var userDataString = Base64.decode(guU.split('.')[0]);
-    var userData = eval(userDataString);
+    var userDataString = decodeUrlSafeBase64(guU.split('.')[0]);
+    var userData = JSON.parse(userDataString);
     jQ("#cookie-id .value").text(userData[0]);
     jQ("#cookie-email-address .value").text(userData[1]);
     jQ("#cookie-display-name .value").text(userData[2]);
@@ -57,17 +57,33 @@
 
     jQ("#cookie-packages .value").text(userPackages.join(','));
 
+    var userUrl = 'http://qaidapi01.gudev.gnl:8800/identity-api/public/user/' + userData[0];
+
     jQ.ajax({
-        url: 'https://qaidapi01.gudev.gnl:8800/identity-api/user/' + userData[0],
+        url: userUrl,
         cache: false,
         crossDomain: true,
-        dataType: 'jsonp'
-    }).success(function(userResponse) {
-        var user = Base64.decode(guU.split('.')[0]); userResponse.user
+        dataType: 'jsonp',
+        data : {
+            "encode": "signedResponse"
+        }
+    }).success(function(userResponse, status) {
+        var userDataAsString = decodeUrlSafeBase64(userResponse.split('.')[0]);
+        var user = JSON.parse(userDataAsString);
+
         jQ("#api-response .value").text(JSON.stringify(user));
     });
 
 
+    function decodeUrlSafeBase64(base64) {
+        var standardBase64 = base64.replace('-', '+').replace('_', '/');
+        var padLength = (4 - standardBase64.length % 4) % 4;
+        for(i=0;i<padLength;i++) {
+            standardBase64 = standardBase64 + "=";
+        }
+
+        return atob(standardBase64);
+    }
 
 
 </script>
