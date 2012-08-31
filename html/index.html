@@ -27,7 +27,11 @@
     </li>
 
     <li id="api-response">
-        <span class="name">email from api</span>
+        <span class="name">user record from  api</span>
+        <span class="value"></span>
+    </li>
+    <li id="api-response-10615802">
+        <span class="name">user 10615802 from  api</span>
         <span class="value"></span>
     </li>
 
@@ -43,10 +47,8 @@
     jQ("#cookie-email-address .value").text(userData[1]);
     jQ("#cookie-display-name .value").text(userData[2]);
 
-
     var packages = ["BEEN_THERE", "BASIC_IDENTITY", "BASIC_COMMUNITY", "EXTRA" , "GUARDIAN_JOBS", "TV_LISTINGS", "NEWSPAPER_DIRECT", "TEACHERS_NETWORK", "DIGITAL_ARCHIVE", "CLIPPINGS", "GUARDIAN_HOLIDAY_OFFERS"];
     var userPackages = [];
-
 
     var packageBitMap = userData[3];
     for(i = 0; i < packages.length; i++) {
@@ -72,6 +74,23 @@
         var user = JSON.parse(userDataAsString);
 
         jQ("#api-response .value").text(JSON.stringify(user));
+    });
+
+    var userUrlFor10615802 = 'http://qaidapi01.gudev.gnl:8800/identity-api/public/user/10615802';
+
+    jQ.ajax({
+        url: userUrlFor10615802,
+        cache: false,
+        crossDomain: true,
+        dataType: 'jsonp',
+        data : {
+            "encode": "signedResponse"
+        }
+    }).success(function(userResponse, status) {
+        var userDataAsString = decodeUrlSafeBase64(userResponse.split('.')[0]);
+        var user = JSON.parse(userDataAsString);
+
+        jQ("#api-response-10615802 .value").text(JSON.stringify(user));
     });
 
 
